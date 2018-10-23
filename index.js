@@ -72,8 +72,6 @@ goThroughAllPropertiesTest();
 
 stringTest();
 
-arrayTest();
-
 function createInstanceOfConstructorFunctionTest() {
     const machine = new Machine('engine', '50 kW'); // if Machine wouldn't have any params, we can call 'new Machine', without brackets
     console.log(machine);
@@ -119,17 +117,6 @@ function checkPropertyOfObjectTest() {
     const checkOwnPropertyNewStyle = 'noSuchProperty' in user;
     console.log(`user.noSuchProperty old style: ${checkOwnPropertyOldStyle}`);
     console.log(`user.noSuchProperty old style: ${checkOwnPropertyNewStyle}`);
-}
-
-function arrayTest() {
-    const names = new Array('Jörg', 'adam', 'valentina'); // Array is a Object
-    const anotherNames = names; // also copy the reference
-    names.shift(); // remove first element, pop() remove the last one
-    ///// names.addressString = 'Sth 15, Stockholm' 
-    // we can work with array like it was an object, but ES engine tuns it into object and advantages of Array collectoin disappear (fast, efficient, ...)
-    for (let i of anotherNames) {
-        console.log(i);
-    }
 }
 
 function stringTest() {
