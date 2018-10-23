@@ -19,7 +19,7 @@ const address = { // we can define object as a 'constant'
     streetNumber: 30,
 };
 address.city = 'Koberice'; // address constant still refers to same memory, we're changing only property
-address.street = 'Nadrazni'; 
+address.street = 'Nadrazni';
 
 const id = Symbol("id");
 
@@ -30,7 +30,7 @@ user = { // note: objects are always TRUE
     salary: 35000,
     propertyToBeDeleted: true,
     [multipleWordsProperty]: false, // “trailing” or “hanging” comma - easier to add/remove/move around properties
-    sayHi: function() { console.log(`Hello ${this.login}!`); }, // arrow functions doesn't have 'this' operator
+    sayHi: function () { console.log(`Hello ${this.login}!`); }, // arrow functions doesn't have 'this' operator
     sayBye() { console.log(`Bye ${this.login}!`) },
 
     [Symbol.toPrimitive](hint) { // using symbols, ! must return a primitive type !
@@ -131,7 +131,7 @@ function string() {
     }
     const startsWith = width.startsWith('1');
     const endsWith = width.endsWith('0p');
-    const substring = width.substring(0, 2);
-    const substr = width.substr(0, 4);
+    const substring = width.substring(0, 2); // first start, second end element, but splice is more optimized
+    const substr = width.substr(0, 4); // first is start from element, second is length
     const splice = width.slice(0, 2); // most used, recommended, frist number must not be greater than second one
 }
