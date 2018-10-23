@@ -8,7 +8,7 @@ describe('js-demo', () => {
     let inputNumberA, inputNumberB;
 
     before(() => { // 'before' is run before mocha tests, same after
-        console.log(`before tests...`);
+        (`before tests...`);
     });
 
     beforeEach(() => { // 'beforeEach' is run before every it(...) block, same after

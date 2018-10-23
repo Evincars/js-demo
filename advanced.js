@@ -1,9 +1,9 @@
 
 (function advanced() {
-    arrayTest();
+    array();
 })();
 
-function arrayTest() {
+function array() {
     const names = new Array('Jörg', 'adam', 'valentina'); // Array is a Object
     const namesWithGivenArrayLenght = new Array(20);
     const anotherNames = names; // also copy the reference
@@ -18,13 +18,13 @@ function arrayTest() {
     names.splice(0, names.length, 'adam', 'and', 'valentina', '?'); // from first element to last one replace with: 'adam', 'and', 'valentina'
 
     const removedElements = names.splice(names.length - 1, 1);
-    console.log(`removedElements: ${removedElements}`);
+    (`removedElements: ${removedElements}`);
 
     names.splice(names.length, 0, 'will', 'be', 'married'); // from last element, delete 0 elements and replace them with: 'will', 'be', 'married'
-    console.log(names);
+    (names);
 
     for (let i of [1, 2, 3]) { // for (let ... in ...) // is for objects, otherwise for...of for arrays, but we for.in shouldn't use, it's slowerer
-        console.log(`\t${i}`);
+        (`\t${i}`);
     }
     names.length = 0; // simplest way to clear array
 }
