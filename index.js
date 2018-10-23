@@ -1,8 +1,10 @@
 'use strict'; // use modern ES features
 
-console.log(typeof [1, 2, 3]);
+console.log(typeof [1, 2, 3]); // array is always object
 console.log(`2^4 = ${2 ** 4}`);
 console.log(!!"convert string to boolean by double NOT");
+
+const convertedToString = String(12345);
 
 const constructorObject = new Object(); // object constructor syntax
 let user = {}; // object literal syntax
@@ -47,40 +49,34 @@ user = {
 user[multipleWordsProperty] = true;
 user.isAdmin = true; // add property
 
+// note: objects are always TRUE
+
 // alert(user);
 // alert(+user + 5000);
 
-user.sayHi();
-user['sayHi']();
-user.sayBye();
+createInstanceOfConstructorFunctionTest();
 
-let userReferenceCopy = user; // reference copy
-userReferenceCopy.login = 'adam.lasak@tieto.com';
+callingMethodsAndDefaultTypeConversionTest();
 
-let clonedAndMergeObjects = new Object();
-Object.assign(clonedAndMergeObjects, user, address);
-
-console.log(user);
-console.log(clonedAndMergeObjects);
-
-// GLOBAL SYMBOL - symbols inside the registry, it's accessible everywhere in code
-const anotherSymbol = Symbol.for("Another ID"); // if it will not find Symbol with 'Another ID' string, then it'll create one
-console.log(`anotherSymbol === Symbol.for("Another ID"): ${anotherSymbol === Symbol.for("Another ID")}`);
-console.log(`Symbol.keyFor(anotherSymbol): ${Symbol.keyFor(anotherSymbol)}`);
+referenceAndCloningObjectTest();
 
 delete user.propertyToBeDeleted; // correct by Google: user.propertyToBeDeleted = undefined;
 
 console.log(user);
 
-const checkOwnPropertyOldStyle = user.noSuchProperty === undefined;
-const checkOwnPropertyNewStyle = 'noSuchProperty' in user;
-console.log(`user.noSuchProperty old style: ${checkOwnPropertyOldStyle}`);
-console.log(`user.noSuchProperty old style: ${checkOwnPropertyNewStyle}`);
+symbolMethodsTest();
 
-const convertedToString = String(12345);
+checkPropertyOfObjectTest();
 
-for(let key in user){ // go through all poperties in 'user' object
-    console.log(`user key: ${key}`);
+goThroughAllPropertiesTest();
+
+stringTest();
+
+arrayTest();
+
+function createInstanceOfConstructorFunctionTest() {
+    const machine = new Machine('engine', '50 kW'); // if Machine wouldn't have any params, we can call 'new Machine', without brackets
+    console.log(machine);
 }
 
 function Machine(type, performance) { // constructor of machine 'class'
@@ -90,31 +86,71 @@ function Machine(type, performance) { // constructor of machine 'class'
     // return this;  (implicitly)
 }
 
-const machine = new Machine('engine', '50 kW'); // if Machine wouldn't have any params, we can call 'new Machine', without brackets
-console.log(machine);
-
-// “object wrapper” is created that provides the extra functionality to primitive object (string, number, symbol, null, ...), and then is destroyed.
-// they are typing like String, Number, Symbol, Boolean ... null or undefined doesn't have wrapper
-const str = 'adam lasak'; // const str = new String('adam'); ==>> highly unrecommended
-console.log(str.toUpperCase());
-
-// note: objects are always TRUE
-
-const width = '100px';
-const convertNumberToBinary = 123456..toString(2); // also cab be write as (123456).toString(2);
-const convertNumberTo36Base = 123456..toString(36); // can be used for example in storten url, in this case output will be 2n9c
-console.log(`convertNumberToBinary: ${convertNumberToBinary}, convertNumberTo36Base: ${convertNumberTo36Base}`);
-const widthNumber = parseInt(width); // better than union + or Number(...), because it ignores the '...px' string
-console.log(`parseInt to hexa: ${ parseInt('0xff', 16) }`);
-
-// ~n = -(n + 1)
-// ~2 = -3
-// ~-1 = 0
-
-if (~width.indexOf('px')){ // if false, indexOf(...) returns -1, and ~-1 is 0 so the if statement will be false
-    console.log(`index of \'px\' string: ${ width.indexOf('px') }`);
+function callingMethodsAndDefaultTypeConversionTest() {
+    user.sayHi();
+    user['sayHi']();
+    user.sayBye();
 }
 
-console.log( `${width.startsWith('1')}, substring(start pos, end pos): ${width.substring(0, 2)}` );
-console.log( `${width.endsWith('0p')}, substr(start pos, lenght): ${width.substr(0, 4)}` );
-console.log( `slice(start pos, end pos): ${width.slice(0, 2)}` ); // most used, recommended, frist number must not be greater than second one
+function referenceAndCloningObjectTest() {
+    let userReferenceCopy = user; // reference copy
+    userReferenceCopy.login = 'adam.lasak@tieto.com';
+    let clonedAndMergeObjects = new Object();
+    Object.assign(clonedAndMergeObjects, user, address);
+    console.log(user);
+    console.log(clonedAndMergeObjects);
+}
+
+function symbolMethodsTest() {
+    // GLOBAL SYMBOL - symbols inside the registry, it's accessible everywhere in code
+    const anotherSymbol = Symbol.for("Another ID"); // if it will not find Symbol with 'Another ID' string, then it'll create one
+    console.log(`anotherSymbol === Symbol.for("Another ID"): ${anotherSymbol === Symbol.for("Another ID")}`);
+    console.log(`Symbol.keyFor(anotherSymbol): ${Symbol.keyFor(anotherSymbol)}`);
+}
+
+function goThroughAllPropertiesTest() {
+    for (let key in user) { // go through all poperties in 'user' object
+        console.log(`user key: ${key}`);
+    }
+}
+
+function checkPropertyOfObjectTest() {
+    const checkOwnPropertyOldStyle = user.noSuchProperty === undefined;
+    const checkOwnPropertyNewStyle = 'noSuchProperty' in user;
+    console.log(`user.noSuchProperty old style: ${checkOwnPropertyOldStyle}`);
+    console.log(`user.noSuchProperty old style: ${checkOwnPropertyNewStyle}`);
+}
+
+function arrayTest() {
+    const names = new Array('Jörg', 'adam', 'valentina'); // Array is a Object
+    const anotherNames = names; // also copy the reference
+    names.shift(); // remove first element, pop() remove the last one
+    ///// names.addressString = 'Sth 15, Stockholm' 
+    // we can work with array like it was an object, but ES engine tuns it into object and advantages of Array collectoin disappear (fast, efficient, ...)
+    for (let i of anotherNames) {
+        console.log(i);
+    }
+}
+
+function stringTest() {
+    // “object wrapper” is created that provides the extra functionality to primitive object (string, number, symbol, null, ...), and then is destroyed.
+    // they are typing like String, Number, Symbol, Boolean ... null or undefined doesn't have wrapper
+    const str = 'adam lasak'; // const str = new String('adam'); ==>> highly unrecommended
+    console.log(str.toUpperCase());
+
+    const width = '100px';
+    const convertNumberToBinary = 123456..toString(2); // also cab be write as (123456).toString(2);
+    const convertNumberTo36Base = 123456..toString(36); // can be used for example in storten url, in this case output will be 2n9c
+    console.log(`convertNumberToBinary: ${convertNumberToBinary}, convertNumberTo36Base: ${convertNumberTo36Base}`);
+    const widthNumber = parseInt(width); // better than union + or Number(...), because it ignores the '...px' string
+    console.log(`parseInt to hexa: ${parseInt('0xff', 16)}`);
+    // ~n = -(n + 1)
+    // ~2 = -3
+    // ~-1 = 0
+    if (~width.indexOf('px')) { // if false, indexOf(...) returns -1, and ~-1 is 0 so the if statement will be false
+        console.log(`index of \'px\' string: ${width.indexOf('px')}`);
+    }
+    console.log(`${width.startsWith('1')}, substring(start pos, end pos): ${width.substring(0, 2)}`);
+    console.log(`${width.endsWith('0p')}, substr(start pos, lenght): ${width.substr(0, 4)}`);
+    console.log(`slice(start pos, end pos): ${width.slice(0, 2)}`); // most used, recommended, frist number must not be greater than second one
+}
