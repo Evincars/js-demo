@@ -3,6 +3,8 @@
     array();
     iterator();
     map();
+    set();
+    weakMapWeakSet();
 })();
 
 function array() {
@@ -161,4 +163,43 @@ function map() {
         keysOfAbilities.push(key);
     }
 
+    // can also use forEach to map
+}
+
+function set() {
+
+    // the item stored in set can be there only once
+    const aragorn = { name: 'Aragorn' };
+    const gandalf = { name: 'Gandalf' };
+
+    const setOfFellowship = new Set();
+    setOfFellowship.add(aragorn);
+    setOfFellowship.add(gandalf);
+    setOfFellowship.add(aragorn);
+
+    const sizeOfFellowship = setOfFellowship.size; // 2
+    const names = new Array();
+    setOfFellowship.forEach((value, value2, givenSet) => { // twice the same value because of compatibility with map.forEach(...)
+        // for map.forEach((values, keys, givenMap) => ... )
+        names.push(value);
+        names.push(value2);
+    });
+}
+
+function weakMapWeakSet() {
+    // weakMap and weakSet automatically cleans up collection, when outside we delete object which was key in weakMap or weakSet
+    // weakMap and weakSet doesn't support methods like size, values, keys, because we don't know, when ES engine 
+    // really delete object as key from memory
+
+    let aragorn = { name: 'Aragorn' };
+    let gandalf = { name: 'Gandalf' };
+
+    const fellowship = new WeakMap();
+    fellowship.set(aragorn);
+    fellowship.set(gandalf);
+
+    gandalf = null; // delete Gandalf from memory
+    // size of fellowhip (weakMap) is now 1
+
+    // it's same for the weakSet
 }
