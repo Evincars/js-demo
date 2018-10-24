@@ -1,6 +1,8 @@
 
-(function advanced() {
+(function dataTypes() {
     array();
+    iterator();
+    map();
 })();
 
 function array() {
@@ -80,4 +82,83 @@ function searchInArray(names) {
     const natureNumbers = [0, 1, 2, 3, 4, 5];
     const sumFromLeft = natureNumbers.reduce((sum, item, index, array) => sum + item, 0); // 0 is initial value, if not specified, then is first element taken
     const sumFromRight = natureNumbers.reduceRight((sum, item, index, array) => sum + item, 0);
+}
+
+function iterator() {
+
+    // Iterables are objects that implement the Symbol.iterator method
+    const range = {
+        from: 1,
+        to: 10,
+
+        [Symbol.iterator]() {
+            this.current = this.from;
+            return this; // for..of loop needs next() method, we're returning this object with own next() method
+        },
+
+        next() { // necessary
+            if (this.current <= this.to) { // current is defined by default
+                return { done: false, value: this.current++ }; // structure is of returned object is strictly defined
+            }
+            return { done: true };
+        },
+    };
+
+    const outputRange = new Array();
+    for (let item of range) {
+        outputRange.push(item);
+    }
+
+    const movieTitle = 'The Lord of the Rings';
+    const outputChars = new Array();
+
+    for (let char of movieTitle) { // using implicit iterator
+        outputChars.push(char);
+    }
+
+    const iterator = movieTitle[Symbol.iterator]();
+    outputChars.length = 0;
+
+    while (true) { // using explicit iterator
+        const result = iterator.next();
+        if (result.done) break;
+        outputChars.push(result.value);
+    }
+
+    const likeArray = { // likeArray have numbered properties and looks like array but actually is not. CANNOT iterate through likeArray
+        0: 'Aragorn',
+        1: 'Gandalf',
+        length: 2,
+    };
+
+    // Array.from(obj[, mapFn, thisArg]) 
+    //    -- mapFn should be the function to apply to each element before adding to the array, and thisArg allows to set this for it.
+    const convertLikeArrayToArray = Array.from(likeArray, item => `main: ${item}`);
+    convertLikeArrayToArray.push('Frodo');
+
+    const convertStringToArray = Array.from(movieTitle); // ... just make array from anything
+}
+
+function map() {
+
+    const frodo = { id: 3, name: 'Frodo' };
+    const heroes = new Map([
+        [{ id: 1, name: 'Aragorn' }, '500'],
+        [{ id: 2, name: 'Gandalf' }, '900'],
+    ]);
+
+    heroes.set(frodo, 200).set({ id: 4, name: 'Sam' }, 250);
+
+    const frodoMap = heroes.get(frodo);
+
+    const abilities = new Map(Object.entries({
+        power: 500,
+        skill: 700
+    }));
+
+    const keysOfAbilities = new Array();
+    for (let key of abilities.keys()) {
+        keysOfAbilities.push(key);
+    }
+
 }
