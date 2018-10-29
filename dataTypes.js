@@ -5,6 +5,9 @@
     map();
     set();
     weakMapWeakSet();
+    objectKeysValuesEntries();
+    destructuring();
+    dateTime();
 })();
 
 function array() {
@@ -202,4 +205,93 @@ function weakMapWeakSet() {
     // size of fellowhip (weakMap) is now 1
 
     // it's same for the weakSet
+}
+
+function objectKeysValuesEntries() {
+
+    // Object.keys, values, entries ALWAYS returns an array
+    // they ignore ignore symbolic (Symbol(...) - symbols are hidden) properties
+    const user = {
+        [Symbol("id")]: 'id',
+        apiKey: 'sf1561a1',
+        name: 'Adam',
+    };
+
+    const keys = Object.keys(user); // returns array
+    const keysWithSymbols = Object.getOwnPropertySymbols(user); // returns only symbol's array
+    const values = Object.values(user); // returns array
+    const entries = Object.entries(user); // array of arrays
+
+    let keysString = '';
+    for (let key of Object.keys(user)) { // same as for..in
+        keysString += `${key}, `;
+    }
+
+}
+
+function destructuring() {
+
+    const user = {
+        id: 'id1',
+        name: 'Adam',
+        apiKey: '156s1a'
+    };
+    const { id, name: n = 'Aragorn' } = user; // default value
+    const { ...rest } = user; // ...rest in objects doesn't support much browsers yet
+
+    const fellowship = ['Aragorn', 'Gandalf', 'Frodo'];
+    const [, gandalf, frodo] = fellowship; // first item 'aragorn' is skipped
+
+    let usersKeyAndValues = '';
+    for (let [id, name] of Object.entries(user)) {
+        usersKeyAndValues += `${id}:${name}; `;
+    }
+
+    const [caesarName, caesarSurname, ...restSentence] = ["Julius", "Caesar", "Consul", "of the Roman Republic"];
+    const [position = 'programmer', skills] = []; // set default value, otherwise is undefined
+
+
+    const aragornSettings = {
+        [Symbol("aragorn")]: 'idAragorn',
+        name: 'Aragorn son of Arathorn',
+        skills: {
+            sword: 9,
+            bow: 2,
+            ride: 8
+        }
+    }
+
+    // Smart function parameters - for reducing number of params in funciton, it won't look so ugly when we'll call it
+    function initFellowshipSettings({
+        name: n = 'Adam',
+        skills: { sword = 5, bow = 5, ride = 0, },
+    }) {
+        return `${n}:: sword ${sword}/10, box ${bow}/10, ride ${ride}/10`;
+    }
+
+    const aragornSettingsString = initFellowshipSettings(aragornSettings);
+    const defaultSettingsString = initFellowshipSettings({ skills: {} }); // if we'd call initFellowshipSettings(), it occurs an error
+
+}
+
+function dateTime() {
+
+    const today = new Date();
+    const timeStamp = new Date(0); // timeStamp - how many miliseconds passes since 1970, input 0 means exactly 1.1. 1970
+    const givenDate = new Date(2018 - 09 - 26); // month is indexed from zero, 0 is January
+
+    const year = givenDate.getFullYear(); // getYear() gives only two digits => deprecated
+    const month = givenDate.getMonth();
+    const day = givenDate.getDate(); // get day
+    const dayInWeek = givenDate.getDay(); // day in week, 0-6 where 0 is Sunday => week starts with sunday in US
+    const time = givenDate.getTime() // given time (miliseconds) from January 1st of 1970 UTC+0
+
+    const yearUTC = givenDate.getUTCFullYear();
+    const monthUTC = givenDate.getUTCMonth();
+    const dayUTC = givenDate.getUTCDate();
+    const dayInWeekUTC = givenDate.getDay();
+
+    const timeOffset = givenDate.getTimezoneOffset();
+    // set... method are same
+
 }
