@@ -8,6 +8,7 @@
     objectKeysValuesEntries();
     destructuring();
     dateTime();
+    json();
 })();
 
 function array() {
@@ -293,5 +294,39 @@ function dateTime() {
 
     const timeOffset = givenDate.getTimezoneOffset();
     // set... method are same
+
+    // Date.now(); is same as new Date().getTime();
+
+}
+
+function json() {
+
+    const user = {
+        [Symbol("id")]: 123, // igonred by JSON.stringify
+        mail: 'lasak.ad@gmail.com', // sipmle quotes are converted to double-quotes
+        isAdmin: false,
+        authorization: {
+            read: true,
+            write: false,
+            execute: true,
+        },
+    };
+
+    const jsonUserVariant1 = JSON.stringify(user);
+    const jsonUserVariant2 = JSON.stringify(user, ['mail']); // define array of properties converted to JSON
+    const jsonUserVariant3 = JSON.stringify(user, (key, value) => {
+        return (key == 'isAdmin') ? undefined : value;
+    });
+
+    const parsedFromStringVariant1 = JSON.parse('[0, 1, 3, 5, 7]');
+    const parsedFromStringVariant2 = JSON.parse('{"id": 1, "name": "LOTR"}'); // must be double-quotes
+
+    const meetup = '{"title":"Conference","date":"2017-11-30T12:00:00.000Z"}';
+    const parsedMeetup = JSON.parse(meetup);
+    // parsedMeetup.date.getTime(); // TypeError: parsedMeetup.date.getTime is not a function
+    const parsedMeetupCorrectly = JSON.parse(meetup, (key, value) => {
+        return (key == 'date') ? new Date(value) : value;
+    });
+    const timeFrom1970 = parsedMeetupCorrectly.date.getTime();
 
 }
