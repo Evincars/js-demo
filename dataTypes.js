@@ -1,4 +1,3 @@
-
 (function dataTypes() {
     array();
     iterator();
