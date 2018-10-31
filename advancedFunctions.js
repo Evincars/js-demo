@@ -33,7 +33,7 @@
 
     // with added name after function, we can refer to that function. 
     // If we'd use pow.property, the name 'pow' can be changed in future and function will throw error
-    let squarePow = function func(base) { 
+    let squarePow = function func(base) {
         func.base = base;
         return func.base ** func.base;
     };
@@ -50,11 +50,24 @@
     const addedNumbers = addNumbers(5, 5);
     const returnedString = helloWorld();
 
-    sheddulingACall();
+    // sheddulingACall();
+    // alert(asynchronousSetTimeout(10, 20, 30));
+    const myTimer = MyTimer(1e5);
+    myTimer();
+
+    const primaryName = {
+        name: 'Adam',
+    }
+    const numbers = [19, 20, 5, 100];
+    const greetings = sayHi.call(primaryName, 'Valentina'); // passing reference to 'this' object
+    const minimum = Math.min.apply(null, numbers); // same as call, just second arg is array
+
+    const createdHash = createHash('adam', 'lasak', '96075837');
 
 })();
 
 // or we can use arguments[], note: in arrow F are not allower arguments, the have not this operator either
+// arguments[] is array-like object !!
 function multipleArgs(...args) {
     let sum = 0;
     args.forEach(value => sum += value);
@@ -94,9 +107,44 @@ function sheddulingACall() {
     setTimeout(clearInterval, 10000, timerId); // after 10 seconds we disable setInterval, cleanInterval clears setInterval function from memory
 
     // !! Recursive setTimeout guarantees a delay between the executions, setInterval – does not. !!
-    let recursiveTimeoutId = setTimeout(function tick(){
+    let recursiveTimeoutId = setTimeout(function tick() {
         alert('tick');
         recursiveTimeoutId = setTimeout(tick, 2000);
     }, 2000);
 
+}
+
+function asynchronousSetTimeout(...args) {
+    let sum = 0;
+
+    // unction is scheduled to run “right after” the current code. In other words, asynchronously.
+    // it can be used for background calculating or requesting on server and meanwhile user still can click through UI
+    const timeoutId = setTimeout(() => alert(`Asynchronous calling...`), 0);
+
+    for (let number of args) {
+        sum += number;
+    }
+    return sum;
+}
+
+function MyTimer(max) {
+
+    function tick() {
+        if (tick.count <= max) {
+            counterElement.innerHTML = tick.count++;
+            setTimeout(tick, 0); // without setTimeout result of max number will be rendered immediately
+            // tick();
+        }
+    }
+    tick.count = 0;
+    return tick;
+}
+
+function sayHi(secondName) {
+    return `Hi ${this.name} and ${secondName}!`;
+}
+
+function createHash() {
+    // return arguments.join(); // arguments.join is not a function => arguments is array-like !
+    return [].join.apply(arguments); // "method borrowing" , join() simply concate 'this' arguments, many functions use this method
 }
