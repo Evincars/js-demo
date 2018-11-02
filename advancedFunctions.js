@@ -86,8 +86,9 @@
         // Now it works, because it receives user from the outer lexical environment, and then calls the method normally.
         setTimeout(() => user.sayHi(), 1000);
     }
-    
+
     partial();
+    currying();
 
 })();
 
@@ -177,19 +178,47 @@ function createHash() {
 function partial() {
 
     function partial(func, ...primaryParams) { // ...params for global usage
-        return function(...secondaryParams) {
+        return function (...secondaryParams) {
             return func.call(this, ...primaryParams, ...secondaryParams);
         }
     }
 
     const chatting = {
         name: 'Adam',
-        message: function(time, givenMessage) {
+        message: function (time, givenMessage) {
             return `[${time}] ${this.name}: ${givenMessage}`;
         },
     }
 
     chatting.say = partial(chatting.message, `${new Date().getHours()}:${new Date().getMinutes()}`);
     console.log(chatting.say('Hi'));
+
+}
+
+function currying() {
+
+    // LODASH currying method doing something like that convert an function into:
+    function curry(func) {
+        return function(a) {
+            return function(b) {
+                return func(a, b);
+            };
+        };
+    }
+
+    function log(date, importance, message) {
+        console.log(`[${date.getHours()}:${date.getMinutes()}] [${importance}] ${message}`);
+    }
+
+    log(new Date(), 'WARN', 'sth');
+    log(new Date(), 'INFO', 'sth');
+
+    log = _.curry(log);
+
+    log(new Date(), 'INFO', 'sth');
+    log(new Date()) ('WARN') ('The Terminator');
+
+    const todaysLog = log(new Date());
+    todaysLog('ERR', 'The Terminator');
 
 }
