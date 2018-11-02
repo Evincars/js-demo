@@ -55,14 +55,39 @@
     const myTimer = MyTimer(1e5);
     myTimer();
 
-    const primaryName = {
+    let primaryName = {
         name: 'Adam',
     }
     const numbers = [19, 20, 5, 100];
+
+    // Use .bind() when you want that function to later be called with a certain context, 
+    // useful in events. Use .call() or .apply() when you want to invoke the function immediately, and modify the context.
     const greetings = sayHi.call(primaryName, 'Valentina'); // passing reference to 'this' object
     const minimum = Math.min.apply(null, numbers); // same as call, just second arg is array
+    const bindGreetings = sayHi.bind(primaryName, 'Valentina'); // ...simplify copy function body and this operator
+    primaryName = null; // now I can delete this object, it's already copied
+    const bindString = bindGreetings();
 
     const createdHash = createHash('adam', 'lasak', '96075837');
+
+    let user = {
+        firstName: "John",
+        sayHi() {
+            alert(`Hello, ${this.firstName}!`);
+        }
+    };
+
+    if (false) { // false for stop disturbing alert windows
+        setTimeout(user.sayHi, 1000); // 'this' is lost so it'll print 'Hello undefined'
+        const f = user.sayHi;
+        setTimeout(f, 1000); // ...same problem
+
+        // Solution 1. - Wrapper
+        // Now it works, because it receives user from the outer lexical environment, and then calls the method normally.
+        setTimeout(() => user.sayHi(), 1000);
+    }
+    
+    partial();
 
 })();
 
@@ -147,4 +172,24 @@ function sayHi(secondName) {
 function createHash() {
     // return arguments.join(); // arguments.join is not a function => arguments is array-like !
     return [].join.apply(arguments); // "method borrowing" , join() simply concate 'this' arguments, many functions use this method
+}
+
+function partial() {
+
+    function partial(func, ...primaryParams) { // ...params for global usage
+        return function(...secondaryParams) {
+            return func.call(this, ...primaryParams, ...secondaryParams);
+        }
+    }
+
+    const chatting = {
+        name: 'Adam',
+        message: function(time, givenMessage) {
+            return `[${time}] ${this.name}: ${givenMessage}`;
+        },
+    }
+
+    chatting.say = partial(chatting.message, `${new Date().getHours()}:${new Date().getMinutes()}`);
+    console.log(chatting.say('Hi'));
+
 }
