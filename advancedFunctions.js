@@ -2,6 +2,12 @@
 
 // Functions are objects.
 
+// PersonX = function(){};
+// Places a reference to an anonymous function into PersonX. PersonX points to a function.
+
+// PersonY = new function(){};
+// Places a reference to a newly constructed instance of an anonymous constructor function into PersonY. PersonY points to an object.
+
 { // {...} is newer than (function () {...})();
 }
 
@@ -199,8 +205,8 @@ function currying() {
 
     // LODASH currying method doing something like that convert an function into:
     function curry(func) {
-        return function(a) {
-            return function(b) {
+        return function (a) {
+            return function (b) {
                 return func(a, b);
             };
         };
@@ -216,7 +222,7 @@ function currying() {
     log = _.curry(log);
 
     log(new Date(), 'INFO', 'sth');
-    log(new Date()) ('WARN') ('The Terminator');
+    log(new Date())('WARN')('The Terminator');
 
     const todaysLog = log(new Date());
     todaysLog('ERR', 'The Terminator');
