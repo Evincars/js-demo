@@ -2,6 +2,8 @@
 (function () {
     propertyFlags();
     gettersAndSetters();
+    inheritance();
+    oldStylePrototype();
 })();
 
 function propertyFlags() {
@@ -69,4 +71,72 @@ function gettersAndSetters() {
     user.fullName = 'Adam Lasak';
     const toString = user.toString;
 
+}
+
+function inheritance() {
+
+    // objects have a special hidden property [[Prototype]], that is either null 
+    // or references another object. That object is called “a prototype”:
+    // ...simplify it's reference to ancestor object
+    // [[Prototype]] can be set as __proto__ = obj;
+
+    const user = {
+        name: "John",
+        surname: "Smith",
+      
+        set fullName(value) {
+          [this.name, this.surname] = value.split(' ');
+        },
+      
+        get fullName() {
+          return `${this.name} ${this.surname}`;
+        },
+      };
+      
+    const admin = {
+        __proto__: user,
+        isAdmin: true,
+    };
+
+    const superAdmin = {
+        __proto__: user, // if we replace the default prototype as a whole, then there will be no "constructor" in it.
+        isSuperAdmin: true,
+    }
+    
+    const adminPreviousName = admin.fullName;
+    admin.fullName = 'Adam Lasak';
+    const currentAdmin = admin.fullName;
+}
+
+function oldStylePrototype() {
+
+    // every function has a prototype property with a value of the object type, then new operator 
+    // uses it to set [[Prototype]] for the new object.
+    const animal = {
+        eats: true
+    };
+
+    const sth = {
+        sth: 'sth'
+    }
+      
+    function Rabbit(name) {
+        this.name = name;
+    }
+    function Horse(name) {}
+
+    sth.prototype = animal; // for object it only create a 'prototype' property, which is NOT __proto__
+    const horse = new Horse('sth');
+
+    // whne we have an object, don’t know which constructor was used for it (e.g. it comes from a 3rd party library), and we need to create another one of the same kind.
+    const horseFromConstructor = new horse.constructor('sth2'); 
+
+    const referenceToItself = Horse.prototype.constructor == Horse; // the default "prototype" is an object with the only property constructor that points back to the function itself.
+    const referenceFromDescendant = horse.constructor == Horse;
+    
+    Rabbit.prototype = animal;
+    // Not overwrite Rabbit.prototype totally, just add to it. The default Rabbit.prototype.constructor is preserved
+    Rabbit.prototype.jumps = true
+
+    const rabbit = new Rabbit("White Rabbit"); //  rabbit.__proto__ == animal
 }
