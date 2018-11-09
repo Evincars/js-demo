@@ -3,8 +3,10 @@
     propertyFlags();
     gettersAndSetters();
     inheritance();
-    oldStylePrototype();
+    prototypeProperty();
 })();
+
+// note: For instance, when we create an array [1, 2, 3], the default new Array() constructor is used internally
 
 function propertyFlags() {
 
@@ -108,7 +110,10 @@ function inheritance() {
     const currentAdmin = admin.fullName;
 }
 
-function oldStylePrototype() {
+function prototypeProperty() {
+
+    // NOTE: for null and undefined are not protypes
+    //       for string, number, boolean are, like String.prototype, etc. => they are wrappers for primitive types
 
     // every function has a prototype property with a value of the object type, then new operator 
     // uses it to set [[Prototype]] for the new object.
@@ -120,7 +125,7 @@ function oldStylePrototype() {
         sth: 'sth'
     }
       
-    function Rabbit(name) {
+    function Rabbit(name) { // inherit from Function which inherit from Object
         this.name = name;
     }
     function Horse(name) {}
@@ -129,14 +134,32 @@ function oldStylePrototype() {
     const horse = new Horse('sth');
 
     // whne we have an object, don’t know which constructor was used for it (e.g. it comes from a 3rd party library), and we need to create another one of the same kind.
-    const horseFromConstructor = new horse.constructor('sth2'); 
+    const horseFromConstructor = new horse.constructor('sth2');
 
-    const referenceToItself = Horse.prototype.constructor == Horse; // the default "prototype" is an object with the only property constructor that points back to the function itself.
-    const referenceFromDescendant = horse.constructor == Horse;
+    const referenceToItself = Horse.prototype.constructor === Horse; // the default "prototype" is an object with the only property constructor that points back to the function itself.
+    const referenceFromDescendant = horse.constructor === Horse;
+    const everythingInheritFromObject = [].__proto__.__proto__ === Object.prototype;
     
     Rabbit.prototype = animal;
     // Not overwrite Rabbit.prototype totally, just add to it. The default Rabbit.prototype.constructor is preserved
     Rabbit.prototype.jumps = true
 
     const rabbit = new Rabbit("White Rabbit"); //  rabbit.__proto__ == animal
+
+    String.prototype.helloWorld = function() { // we can add methods and properties to main ancestor objects, but it's not recomended
+        return `Hello world! ${this}`;
+    }
+
+    const customFunctionInPrototype = "Adam".helloWorld();
+
+    function makeString(){
+        // The central benefit of function borrowing is that it allows you to forego inheritance. 
+        // There’s no reason for you to force a class to inherit from another if you’re only doing so in order to 
+        // grant instances of the child class access to a single method.
+
+        // return [].join.call(arguments, ' - ');
+        return Array.prototype.join.call(arguments, ' - '); // same, only with using prototypes
+    }
+
+    const borrowingFunction = makeString('adam', 'lasak', '96');
 }

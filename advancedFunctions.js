@@ -177,6 +177,9 @@ function sayHi(secondName) {
 }
 
 function createHash() {
+    // NOTE: function borrowing allows us to use the methods of one object on a different object without 
+    //       having to make a copy of that method and maintain it in two separate places.
+
     // return arguments.join(); // arguments.join is not a function => arguments is array-like !
     return [].join.apply(arguments); // "method borrowing" , join() simply concate 'this' arguments, many functions use this method
 }
