@@ -118,8 +118,11 @@ function prototypeProperty() {
     // every function has a prototype property with a value of the object type, then new operator 
     // uses it to set [[Prototype]] for the new object.
     const animal = {
+        [Symbol("id")]: 'id',
         eats: true
     };
+
+    const extendedAnimal = Object.create(animal, {hunt: {value: true}});
 
     const sth = {
         sth: 'sth'
@@ -141,8 +144,9 @@ function prototypeProperty() {
     const everythingInheritFromObject = [].__proto__.__proto__ === Object.prototype;
     
     Rabbit.prototype = animal;
+
     // Not overwrite Rabbit.prototype totally, just add to it. The default Rabbit.prototype.constructor is preserved
-    Rabbit.prototype.jumps = true
+    Rabbit.prototype.jumps = true; // add the property into ancestor too
 
     const rabbit = new Rabbit("White Rabbit"); //  rabbit.__proto__ == animal
 
@@ -162,4 +166,28 @@ function prototypeProperty() {
     }
 
     const borrowingFunction = makeString('adam', 'lasak', '96');
+
+    // __proto__=sth is slower (it's created in run time), rather use Object.create(...)
+    const correctCreatedDescendant = Object.create(animal, { // first param is ancestor (prototype), // second param [optional] is object of additional properties in descendant
+        run: {value: true, writable: false}, // this line is property descriptor
+    });
+
+    const correctClone = Object.create(
+        Object.getPrototypeOf(correctCreatedDescendant), 
+        Object.getOwnPropertyDescriptors(correctCreatedDescendant)
+    );
+
+    Object.setPrototypeOf(correctClone, correctCreatedDescendant);
+
+    // NOTE: setPrototypeOf, getPrototypeOf, create are newest function for managing prototypes, should by used
+    //       Object.create(...) set __proto__ only once at instance, JS core is optimized for this, changig __proto__ during runtime is slower
+
+    const correctCreatedObject = Object.create(Array.prototype); // in this case - array
+    const veryPlainObject = Object.create(null); // very plain object
+
+    const getOwnPropertySymbols = Object.getOwnPropertySymbols(animal); // get all symbols property
+    const getOwnPropertyNames = Object.getOwnPropertyNames(extendedAnimal); // get only own properties, not inherited
+    const hasOwnProperty = extendedAnimal.hasOwnProperty('eats'); // OWN means not inherited properties, so extendedAnimal doesn't have 'eats' property
+    const ownKeys = Reflect.ownKeys(animal); // get all properties, including symbols and enumerable items
+
 }
