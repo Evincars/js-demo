@@ -1,9 +1,12 @@
+'use strict';
 
 (function () {
     propertyFlags();
     gettersAndSetters();
     inheritance();
     prototypeProperty();
+    prototypeBasedClass();
+    classPattern();
 })();
 
 // note: For instance, when we create an array [1, 2, 3], the default new Array() constructor is used internally
@@ -26,17 +29,17 @@ function propertyFlags() {
         birth: { value: '1996-07-22', configurable: false },
     });
     defaultPropertySettings = Object.getOwnPropertyDescriptor(user, 'name');
-    user.name = 'adam'; // still will be 'admin'
+    // user.name = 'adam'; // error occurs - still will be 'admin'
 
     const potentialClone = Object.defineProperties({}, Object.getOwnPropertyDescriptors(user));
 
     user.address = 'Koberice, Nadrazni 35';
     Object.preventExtensions(user); // cannot add properties
-    user.sth = 'sth'; // 'sth' property will not be added
+    // user.sth = 'sth'; // error - object is not extensible, 'sth' property will not be added
     Object.seal(user); // cannot add/remove properties
-    delete user.address;
+    // delete user.address; // Cannot delete property 'address' of #<Object>
     Object.freeze(user); // cannot add/remove/change properties
-    user.address = 'Koberice, Nadrazni 350/35';
+    // user.address = 'Koberice, Nadrazni 350/35'; // error - cannot assign to read only property 'address' of object '#<Object>'
 
     const isExtensible = Object.isExtensible(user); // returns false if adding properties is forbidden, otherwise true.
     const isSealed = Object.isSealed(user); // returns true if adding/removing properties is forbidden, and all existing properties have configurable: false.
@@ -190,4 +193,54 @@ function prototypeProperty() {
     const hasOwnProperty = extendedAnimal.hasOwnProperty('eats'); // OWN means not inherited properties, so extendedAnimal doesn't have 'eats' property
     const ownKeys = Reflect.ownKeys(animal); // get all properties, including symbols and enumerable items
 
+}
+
+function prototypeBasedClass() {
+
+    function User(name) {
+        [this.name, this.surname] = name.split(' '); // private properties
+    }
+    User.prototype.toString = function() { // public method
+        return `prototype-based class: ${this.name} ${this.surname}`;
+    }
+
+    const user = new User('Adam Lasak');
+    console.log(user.toString());
+
+}
+
+function classPattern() {
+
+    class User { // use strict have to be set
+        constructor(name) {
+            [this.name, this.surname] = name.split(' ');
+        }
+
+        get Name() {
+            return this.name;
+        }
+
+        set Name(value) {
+            this.name = value.length > 3 ? value : null;
+        }
+
+        toString() {
+            return `class: ${this.name} ${this.surname}`;
+        }
+
+        static author() { // function's property...User.author = function() {...}
+            return `Created 2018 | Adam Lasak`;
+        }
+    }
+
+    User.prototype.test = 'static variable'; // visible in all instances
+
+    const user = new User('Adam Lasak');
+    const user2 = new User('Valentina Selzerova');
+    const author = User.author();
+    const visibleStaticProperty = user.test === user2.test; // true
+    console.log(user.toString());
+
+    const userIsConstructorFunction = (User === User.prototype.constructor); // true
+    const userProperties = Object.getOwnPropertyNames(User.prototype);
 }
