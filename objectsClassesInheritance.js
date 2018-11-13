@@ -7,6 +7,7 @@
     prototypeProperty();
     prototypeBasedClass();
     classPattern();
+    classInheritance();
 })();
 
 // note: For instance, when we create an array [1, 2, 3], the default new Array() constructor is used internally
@@ -69,7 +70,7 @@ function gettersAndSetters() {
     Object.defineProperty(user, 'toString', {
         get() {
             return `[${new Date().getFullYear()}] ${this.fullName}`;
-        }      
+        }
     });
 
     const fullName = user.fullName; // not user.fullName()
@@ -88,16 +89,16 @@ function inheritance() {
     const user = {
         name: "John",
         surname: "Smith",
-      
+
         set fullName(value) {
-          [this.name, this.surname] = value.split(' ');
+            [this.name, this.surname] = value.split(' ');
         },
-      
+
         get fullName() {
-          return `${this.name} ${this.surname}`;
+            return `${this.name} ${this.surname}`;
         },
-      };
-      
+    };
+
     const admin = {
         __proto__: user,
         isAdmin: true,
@@ -107,7 +108,7 @@ function inheritance() {
         __proto__: user, // if we replace the default prototype as a whole, then there will be no "constructor" in it.
         isSuperAdmin: true,
     }
-    
+
     const adminPreviousName = admin.fullName;
     admin.fullName = 'Adam Lasak';
     const currentAdmin = admin.fullName;
@@ -125,16 +126,16 @@ function prototypeProperty() {
         eats: true
     };
 
-    const extendedAnimal = Object.create(animal, {hunt: {value: true}});
+    const extendedAnimal = Object.create(animal, { hunt: { value: true } });
 
     const sth = {
         sth: 'sth'
     }
-      
+
     function Rabbit(name) { // inherit from Function which inherit from Object
         this.name = name;
     }
-    function Horse(name) {}
+    function Horse(name) { }
 
     sth.prototype = animal; // for object it only create a 'prototype' property, which is NOT __proto__
     const horse = new Horse('sth');
@@ -145,7 +146,7 @@ function prototypeProperty() {
     const referenceToItself = Horse.prototype.constructor === Horse; // the default "prototype" is an object with the only property constructor that points back to the function itself.
     const referenceFromDescendant = horse.constructor === Horse;
     const everythingInheritFromObject = [].__proto__.__proto__ === Object.prototype;
-    
+
     Rabbit.prototype = animal;
 
     // Not overwrite Rabbit.prototype totally, just add to it. The default Rabbit.prototype.constructor is preserved
@@ -153,13 +154,13 @@ function prototypeProperty() {
 
     const rabbit = new Rabbit("White Rabbit"); //  rabbit.__proto__ == animal
 
-    String.prototype.helloWorld = function() { // we can add methods and properties to main ancestor objects, but it's not recomended
+    String.prototype.helloWorld = function () { // we can add methods and properties to main ancestor objects, but it's not recomended
         return `Hello world! ${this}`;
     }
 
     const customFunctionInPrototype = "Adam".helloWorld();
 
-    function makeString(){
+    function makeString() {
         // The central benefit of function borrowing is that it allows you to forego inheritance. 
         // There’s no reason for you to force a class to inherit from another if you’re only doing so in order to 
         // grant instances of the child class access to a single method.
@@ -172,11 +173,11 @@ function prototypeProperty() {
 
     // __proto__=sth is slower (it's created in run time), rather use Object.create(...)
     const correctCreatedDescendant = Object.create(animal, { // first param is ancestor (prototype), // second param [optional] is object of additional properties in descendant
-        run: {value: true, writable: false}, // this line is property descriptor
+        run: { value: true, writable: false }, // this line is property descriptor
     });
 
     const correctClone = Object.create(
-        Object.getPrototypeOf(correctCreatedDescendant), 
+        Object.getPrototypeOf(correctCreatedDescendant),
         Object.getOwnPropertyDescriptors(correctCreatedDescendant)
     );
 
@@ -200,7 +201,7 @@ function prototypeBasedClass() {
     function User(name) {
         [this.name, this.surname] = name.split(' '); // private properties
     }
-    User.prototype.toString = function() { // public method
+    User.prototype.toString = function () { // public method
         return `prototype-based class: ${this.name} ${this.surname}`;
     }
 
@@ -241,6 +242,32 @@ function classPattern() {
     const visibleStaticProperty = user.test === user2.test; // true
     console.log(user.toString());
 
-    const userIsConstructorFunction = (User === User.prototype.constructor); // true
+    const userIsConstructorFunction = (User === User.prototype.constructor); // true, constructor refers to prototype
     const userProperties = Object.getOwnPropertyNames(User.prototype);
+}
+
+function classInheritance() {
+
+    class User {
+        constructor(login, passwd) { this.login = login; this.password = passwd; }
+        get Login() { return this.login; }
+        get Password() { return this.password; }
+        toString() { return `${this.login}`; }
+    }
+
+    class Admin extends User {
+        constructor() {
+            super('lasakada', 'admin');
+            this.isAdmin = true;
+        }
+        get IsAdmin() { return this.isAdmin; }
+        set IsAdmin(value) { this.isAdmin = value; }
+        toString() {
+            return super.toString() + ', isAdmin: ' + this.isAdmin;
+        }
+    }
+
+    const admin = new Admin();
+    const adminString = admin.toString();
+
 }
