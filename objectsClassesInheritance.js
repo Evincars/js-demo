@@ -8,6 +8,7 @@
     prototypeBasedClass();
     classPattern();
     classInheritance();
+    superInheritalsAndHomeObject();
 })();
 
 // note: For instance, when we create an array [1, 2, 3], the default new Array() constructor is used internally
@@ -269,5 +270,41 @@ function classInheritance() {
 
     const admin = new Admin();
     const adminString = admin.toString();
+
+}
+
+function superInheritalsAndHomeObject() {
+
+    const User = {
+        login: 'user01',
+        toString() {
+            return `[user] ${this.login}`;
+        }
+    }
+
+    const Admin = {
+        __proto__: User,
+        toString() { // [[HomeObject]] === Admin, method must be write as method(...) {} not like method: function() {}
+            // like super.toString()
+            // simply call this.__proto__.toString()  would execute parent toString in the context of the prototype, not the current object.
+            // we want to call it in context of current object
+            const superResult = this.__proto__.toString.call(this); // which is => Admin.__proto__...
+            return superResult + ' descendant';
+        }
+    }
+
+    const Student = {
+        __proto__: Admin,
+        toString() { // [[HomeObject]] === Studnet, method must be write as method(...) {} not like method: function() {}
+            // like super.toString()
+            const superResult = this.__proto__.toString.call(this); // which is => Student.__proto__...
+            // with call(this) in calling Admin.toString() will be this=Student, there will be endless loop
+            return superResult + ' descendant\'s descendant';
+        }
+    }
+
+    // const admin = new Admin(); // TypeError: Admin is not a constructor - it's just an object
+    const returnedStringDescendant = Admin.toString();
+    // const returnedStringDescendant2 = Student.toString(); // RangeError: Maximum call stack size exceeded, in case of calling super.toString() there won't be error
 
 }
