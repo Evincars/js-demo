@@ -2,7 +2,14 @@
 
 (function () {
     usingTryCatchAsynchronous();
-    throwingAnError();
+
+    try { // outer try...catch 
+        throwingAnError();
+    } catch (err) {
+        console.error(err.stack);
+    }
+
+    tryCatchFinally();
 })();
 
 function usingTryCatchAsynchronous() {
@@ -26,7 +33,7 @@ function throwingAnError() {
 
     try {
         if (!false) {
-            const customErrorObject = {customError: 'customError', message: 'message'};
+            const customErrorObject = { customError: 'customError', message: 'message' };
             throw customErrorObject;
         }
     } catch (err) {
@@ -48,11 +55,29 @@ function throwingAnError() {
         throw new Error('some syntax error');
     } catch (err) { // !! each 'try...catch' block should catch only errors that it knows and others 'rethrow' !!
 
-        if (err.name === 'SyntaxError'){ // error that we know
+        if (err.name === 'SyntaxError') { // error that we know
             console.error(err.stack);
         } else { // ...other errors will be 'rethrowed'
-            throw err;
+            throw err; // ...can be either caught by an outer try..catch construct (if it exists), or it kills the script.
         }
 
+    }
+}
+
+function tryCatchFinally() {
+
+    // NOTE: try..finally construct, without catch clause, is also useful. We apply it when we don’t want to handle errors 
+    //       right here, but want to be sure that processes that we started are finalized.
+    try {
+        throw new Error('some error');
+    } catch (err) {
+        if (err.name == 'Error') {
+            console.error(err.stack);
+        } else {
+            throw err;
+        }
+    } finally { // often used when we start doing something before try..catch and want to finalize it in any case of outcome.
+        console.info('always called'); // will be called even if return statement is in 'try' block
+        return 1; // ...explicit return
     }
 }
