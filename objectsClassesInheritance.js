@@ -313,8 +313,8 @@ function superInheritalsAndHomeObject() {
 
 function instanceOf() {
 
-    class Animal {};
-    class Rabbit extends Animal {};
+    class Animal { };
+    class Rabbit extends Animal { };
 
     // Class.prototype.isPrototypeOf(obj)
     const instanceOf1 = new Animal() instanceof Animal; // true
