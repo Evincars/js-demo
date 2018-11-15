@@ -9,6 +9,7 @@
     classPattern();
     classInheritance();
     superInheritalsAndHomeObject();
+    instanceOf();
 })();
 
 // note: For instance, when we create an array [1, 2, 3], the default new Array() constructor is used internally
@@ -173,6 +174,7 @@ function prototypeProperty() {
     const borrowingFunction = makeString('adam', 'lasak', '96');
 
     // __proto__=sth is slower (it's created in run time), rather use Object.create(...)
+    // Object.assign(...) copy methods form one object (f.e. prototype) to another
     const correctCreatedDescendant = Object.create(animal, { // first param is ancestor (prototype), // second param [optional] is object of additional properties in descendant
         run: { value: true, writable: false }, // this line is property descriptor
     });
@@ -306,5 +308,30 @@ function superInheritalsAndHomeObject() {
     // const admin = new Admin(); // TypeError: Admin is not a constructor - it's just an object
     const returnedStringDescendant = Admin.toString();
     // const returnedStringDescendant2 = Student.toString(); // RangeError: Maximum call stack size exceeded, in case of calling super.toString() there won't be error
+
+}
+
+function instanceOf() {
+
+    class Animal {};
+    class Rabbit extends Animal {};
+
+    // Class.prototype.isPrototypeOf(obj)
+    const instanceOf1 = new Animal() instanceof Animal; // true
+    const instanceOf2 = new Rabbit() instanceof Animal; // true
+    const instanceOf3 = new Rabbit() instanceof Rabbit; // true
+    // if we change Class.prototype = {}, the instanceof won't work anymore
+    // that’s one of the reasons to avoid changing prototype
+
+
+    // NOTE: use instanceof for custom types: classes, objects
+    //       use typeof for simple built in types: strings, numbers, booleans // Boolean, String, .. are wrappers for simple data-types for reason of using methods like toString(), etc.
+    const instanceOf4 = 'sth' instanceof String; // false
+    const intsanceOf5 = 3.14 instanceof Number; // false
+    const instanceOf6 = true instanceof Boolean // false
+
+    const typeOf1 = typeof 'sth' === 'string'; // true
+    const typeOf2 = typeof 3.14 === 'number'; // true
+    const typeOf3 = typeof true === 'boolean'; // true
 
 }
