@@ -1,5 +1,26 @@
 'use strict';
 
+class MyError extends Error {
+    constructor(message) {
+        super(message);
+        this.name = this.constructor.name;
+    }
+}
+
+class LoginError extends MyError {
+    constructor(message) {
+        super(message); // this.__prototype__.constructor.call(this, ...)
+        // this.name = 'LoginError'; // with MyError class we don't need to everytime set this.name=<class name>
+    }
+}
+
+class UserDoesNotExistError extends LoginError {
+    constructor(message) {
+        super(`db query: ${message}`);
+        // this.name = 'UserDoesNotExistError'; // with MyError class we don't need to everytime set this.name=<class name>
+    }
+}
+
 (function () {
     usingTryCatchAsynchronous();
 
@@ -10,6 +31,7 @@
     }
 
     tryCatchFinally();
+    usingInstanceofInExceptions();
 })();
 
 function usingTryCatchAsynchronous() {
@@ -79,5 +101,36 @@ function tryCatchFinally() {
     } finally { // often used when we start doing something before try..catch and want to finalize it in any case of outcome.
         console.info('always called'); // will be called even if return statement is in 'try' block
         return 1; // ...explicit return
+    }
+}
+
+function loginUser(loginName, password) {
+
+    const loginData = new Map([
+        ['admin', 'passwd'],
+        ['lasak.ad@gmail.com', 'passwd']
+    ]);
+    const loginExist = loginData.has(loginName);
+
+    if (!loginExist) {
+        throw new UserDoesNotExistError('user does not exist');
+    }
+
+    const collectionPassword = loginData.get(loginName);
+    if (collectionPassword != password) {
+        throw new LoginError('wrong username or password');
+    }
+
+}
+
+function usingInstanceofInExceptions() {
+    try {
+        loginUser('admin1', 'passwd1'); // set wrong username or login which is not in 'DB'
+    } catch (err) {
+        if (err instanceof LoginError) { // we can just put main ancestor and it catch all descendants errors
+            console.error(err.stack);
+        } else {
+            throw err;
+        }
     }
 }
