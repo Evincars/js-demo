@@ -22,7 +22,7 @@ class UserDoesNotExistError extends LoginError {
 }
 
 (function () {
-    usingTryCatchAsynchronous();
+    //usingTryCatchAsynchronous();
 
     try { // outer try...catch 
         throwingAnError();
@@ -45,7 +45,7 @@ function usingTryCatchAsynchronous() {
             console.log(err.message);
             console.log(err.stack); // the most useful, it prints name + message + where the error has occurs
         }
-    }, 1000);
+    }, 0);
 
 }
 
