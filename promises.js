@@ -1,7 +1,41 @@
 'use strict';
 
+// A “thenable” object is any object with a method .then.
+// The idea is that 3rd-party libraries may implement “promise-compatible” objects of their own. 
+// They can have extended set of methods, but also be compatible with native promises, because they implement .then.
+class Thenable {
+    constructor(num) {
+        this.num = num;
+    }
+    then(resolve, reject) {
+        console.log(resolve); // function() { native code }
+        // resolve with this.num*2 after the 1 second
+        setTimeout(() => resolve(this.num * 2), 1000); // (**)
+    }
+}
+
 (function () {
     basicPromise();
+    chainedPromise().then(
+        // subscribers (fans of singer - singer is promise)
+        function (result) { console.log('promises done'); },
+        function (error) { console.log('this error will never called'); }
+    );
+
+    new Promise(resolve => resolve(1)) // This feature allows to integrate custom objects with promise chains without having to inherit from Promise.
+        .then(result => {
+            return new Thenable(result); // (*)
+        })
+        .then(result => console.log(result)); // shows 2 after 1000ms
+    
+    fetchExample();
+
+    // To summarize, .then/catch(handler) returns a new promise that changes depending on what handler does:
+
+    // If it returns a value or finishes without a return (same as return undefined), then the new promise 
+    // becomes resolved, and the closest resolve handler (the first argument of .then) is called with that value.
+    // If it throws an error, then the new promise becomes rejected, and the closest rejection handler 
+    // (second argument of .then or .catch) is called with it. 
 })();
 
 function basicPromise() {
@@ -10,14 +44,20 @@ function basicPromise() {
     // promise object has internal properties (not accessible from inside promise, use then/catch for it):
     //  * state — initially “pending”, then changes to either “fulfilled” or “rejected”,
     //  * result — an arbitrary value of your choosing, initially undefined.
-    const promise = new Promise(function(resolve, reject) { // new Promise is called the executor - called immediately
-        setTimeout(() => {reject(new Error('operation has been rejected'))}, 1000);
+    const promise = new Promise(function (resolve, reject) { // new Promise is called the executor - called immediately
+        setTimeout(() => { reject(new Error('operation has been rejected')) }, 1000);
     });
 
+    // Promises allow us to do things in the natural order. First, we run loadScript, and .then we write what to do with the result.
+    // We can call .then on a Promise as many times as we want. Each time, we’re adding a new “fan”, a new subscribing function, 
+    // to the “subscription list”.
+
     // consumers: “then” and “catch”
+    // consuming functions can be registered !!(subscribed)!! using the methods .then and .catch.
+    // 'then' returns also 'then' -> we can make a chain of calls
     promise.then( // 1st variant
-        function(result) {console.log(result)},
-        function(error) {console.log(error)}
+        function (result) { console.log(result) },
+        function (error) { console.log(error) }
     );
 
     promise.then( // 2nd variant
@@ -32,4 +72,65 @@ function basicPromise() {
     promise.then( // 4rd variant - consume only successfull results
         result => console.log(result)
     )
+}
+
+function chainedPromise() {
+    return new Promise(function (resolve, reject) {
+        // setTimeout(() => reject(), 900); // will never appear because we don't catch it down
+        setTimeout(() => resolve(1), 1000);
+
+    }).then(function (result) {
+
+        console.log(result); // 1
+        return new Promise((resolve, reject) => { // we have to return either new Promise(...) or one of this two functions - resolve, reject
+            setTimeout(() => { return resolve(result * 2); }, 1000); // we don't have to use 'return' keyword
+        });
+
+    }).then(function (result) {
+
+        console.log(result); // 2
+        return new Promise((resolve, reject) => {
+            setTimeout(() => resolve(result * 2), 1000);
+        });
+
+    }).then(function (result) {
+        console.log(result); // 4
+    });
+}
+
+/*
+PYRAMID OF DOOM with promises (don't use it - use chaining):
+
+loadScript("/article/promise-chaining/one.js").then(function(script1) {
+  loadScript("/article/promise-chaining/two.js").then(function(script2) {
+    loadScript("/article/promise-chaining/three.js").then(function(script3) {
+      // this function has access to variables script1, script2 and script3
+      one();
+      two();
+      three();
+    });
+  });
+});
+*/
+
+function fetchExample() {
+
+    fetch('https://javascript.info/article/promise-chaining/user.json')
+        .then(response => response.json())
+        .then(user => fetch(`https://api.github.com/users/${user.name}`))
+        .then(response => response.json())
+        .then(githubUser => new Promise(function(resolve, reject) {
+            let img = document.createElement('img');
+            img.src = githubUser.avatar_url;
+            img.className = "promise-avatar-example";
+            document.body.append(img);
+
+            setTimeout(() => {
+                img.remove();
+                resolve(githubUser);
+            }, 3000);
+        }))
+        // triggers after 3 seconds
+        .then(githubUser => console.log(`Finished showing ${githubUser.name}`));
+
 }
