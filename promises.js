@@ -27,7 +27,7 @@ class Thenable {
             return new Thenable(result); // (*)
         })
         .then(result => console.log(result)); // shows 2 after 1000ms
-    
+
     fetchExample();
 
     // To summarize, .then/catch(handler) returns a new promise that changes depending on what handler does:
@@ -36,6 +36,17 @@ class Thenable {
     // becomes resolved, and the closest resolve handler (the first argument of .then) is called with that value.
     // If it throws an error, then the new promise becomes rejected, and the closest rejection handler 
     // (second argument of .then or .catch) is called with it. 
+
+    promiseResolve().then(resolve => console.log(resolve));
+    promiseReject()
+        .then(resolve => console.log('this will be skipped because of returning reject'))
+        .catch(err => console.log(err));
+    promiseAll()
+        .then(resolve => resolve.forEach(m => console.log(`promiseAll: ${m}`))) // will be ignored because of error
+        .catch(err => console.error(err));
+    promiseRace()
+        .then(resolve => console.log(`promiseRace: ${resolve}`))
+        .catch(err => console.log(err));
 })();
 
 function basicPromise() {
@@ -119,7 +130,7 @@ function fetchExample() {
         .then(response => response.json())
         .then(user => fetch(`https://api.github.com/users/${user.name}`))
         .then(response => response.json())
-        .then(githubUser => new Promise(function(resolve, reject) {
+        .then(githubUser => new Promise(function (resolve, reject) {
             let img = document.createElement('img');
             img.src = githubUser.avatar_url;
             img.className = "promise-avatar-example";
@@ -133,4 +144,43 @@ function fetchExample() {
         // triggers after 3 seconds
         .then(githubUser => console.log(`Finished showing ${githubUser.name}`));
 
+}
+
+function promiseResolve() {
+    const fakeFetchedTextFromAPI = '{"name": "Adam", "surname": "Lasak"}';
+
+    // the method is used when we already have a value, but would like to have it “wrapped” into a promise.
+    return Promise.resolve(fakeFetchedTextFromAPI); // same as let promise = new Promise(resolve => resolve(value));
+}
+
+function promiseReject() {
+    const fakeFetchedTextFromAPI = '{"err": "Server doesn\'t reponse"}';
+
+    // rarely used
+    return Promise.reject(fakeFetchedTextFromAPI); // let promise = new Promise((resolve, reject) => reject(error));
+}
+
+function promiseAll() {
+    // The method to run many promises in parallel and wait till all of them are ready.
+    // It takes an iterable object with promises, technically it can be any iterable, but usually it’s an array, and returns a new promise.
+
+    // The important detail is that promises provide no way to “cancel” or “abort” their execution. 
+    // So other promises continue to execute, and the eventually settle, but all their results are ignored.
+    return Promise.all([
+        new Promise((resolve, reject) => setTimeout(() => resolve(1), 1000)),
+        new Promise((resolve, reject) => setTimeout(() => resolve(2), 500)),
+        new Promise((resolve, reject) => setTimeout(() => reject(new Error('promiseAll err')), 1500)),
+        4, // treated as Promise.resolve(4)
+    ]);
+}
+
+function promiseRace() {
+    // Similar to Promise.all takes an iterable of promises, but instead of waiting for all of them to finish 
+    // – waits for the first result (or error), and goes on with it.
+
+    return Promise.race([
+        new Promise((resolve, reject) => setTimeout(() => resolve('I am first'), 1000)),
+        new Promise((resolve, reject) => setTimeout(() => reject(new Error("Whoops!")), 2000)),
+        new Promise((resolve, reject) => setTimeout(() => resolve('I am last'), 3000))
+    ]);
 }
